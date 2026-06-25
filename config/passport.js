@@ -12,7 +12,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback",
+      callbackURL: "https://carent-ymkk.onrender.com/api/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -41,9 +41,10 @@ passport.use(
   new FacebookStrategy(
     {
       clientID: process.env.FACEBOOK_APP_ID,
-      clientSecret: process.env.FACEBOOK_APP_SCREET,
-      callbackURL: "/api/auth/facebook/callback",
-      profileURL: ["id", "displayName", "photos", "email"],
+      clientSecret: process.env.FACEBOOK_APP_SECRET,
+      callbackURL:
+        "https://carent-ymkk.onrender.com/api/auth/facebook/callback", // 👈 full URL
+      profileFields: ["id", "displayName", "photos", "email"],
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
