@@ -3,6 +3,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
+// Google signup/signin
+import passport from "passport";
+import "../config/passport.js";
+
 const router = express.Router();
 
 const cookieOptions = {
@@ -11,6 +15,15 @@ const cookieOptions = {
   sameSite: "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
+
+// Google login/sign
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    session: false,
+  }),
+);
 
 // ── SIGN UP ──
 router.post("/signup", async (req, res) => {
@@ -74,6 +87,30 @@ router.post("/signin", async (req, res) => {
     res.status(500).json({ message: "Server error. Please try again." });
   }
 });
+
+// Google callback
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "/signin",
+  }),
+  (req, res) => {
+    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    // Redirect to your frontend home
+    res.redirect("http://192.168.1.29:5173/home");
+  },
+);
 
 // ── SIGN OUT ──
 router.post("/signout", (req, res) => {

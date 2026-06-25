@@ -1,22 +1,25 @@
+import dotenv from "dotenv";
+dotenv.config(); // 👈 must be first before anything else
+
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
-import cookieParser from "cookie-parser"; // 👈 add this
+import cookieParser from "cookie-parser";
+import passport from "passport";
+import "./config/passport.js"; // 👈 after dotenv
 import authRoutes from "./routes/auth.js";
-
-dotenv.config();
 
 const app = express();
 
 app.use(
   cors({
-    origin: true,
+    origin: ["https://carent-snowy.vercel.app", "http://localhost:5173"],
     credentials: true,
   }),
 );
 app.use(express.json());
-app.use(cookieParser()); // 👈 add this before routes
+app.use(cookieParser());
+app.use(passport.initialize());
 
 app.use("/api/auth", authRoutes);
 

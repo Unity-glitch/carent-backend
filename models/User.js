@@ -3,18 +3,12 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      minlength: 6,
-    },
+    email: { type: String, unique: true, lowercase: true, trim: true },
+    password: { type: String }, // optional now (social users have no password)
+    name: { type: String },
+    avatar: { type: String },
+    provider: { type: String, default: "local" }, // "local", "google", "facebook"
+    providerId: { type: String },
   },
   { timestamps: true },
 );
