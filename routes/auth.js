@@ -6,7 +6,6 @@ import User from "../models/User.js";
 // auth signup/signin
 import passport from "passport";
 import "../config/passport.js";
-import SignUp from "../../carent-frontend/src/onboarding/Signup.jsx";
 
 const router = express.Router();
 
