@@ -10,10 +10,10 @@ import "../config/passport.js";
 const router = express.Router();
 
 const cookieOptions = {
-  httpOnly: true, // not accessible via JS
-  secure: false, // set true in production (HTTPS)
-  sameSite: "lax",
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  httpOnly: true,
+  secure: true, // 👈 changed
+  sameSite: "none", // 👈 changed
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 // Google login/sign
@@ -108,7 +108,7 @@ router.get(
     });
 
     // Redirect to your frontend home
-    res.redirect("http://192.168.1.29:5173/home");
+    res.redirect("https://carent-snowy.vercel.app/home"); // 👈 changed
   },
 );
 
