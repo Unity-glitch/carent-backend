@@ -3,9 +3,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-// Google signup/signin
+// auth signup/signin
 import passport from "passport";
 import "../config/passport.js";
+import SignUp from "../../carent-frontend/src/onboarding/Signup.jsx";
 
 const router = express.Router();
 
@@ -23,6 +24,12 @@ router.get(
     scope: ["profile", "email"],
     session: false,
   }),
+);
+
+// Facebook SignUp/signin
+router.get(
+  "/facebook",
+  passport.authenticate("facebook", { scope: ["email"] }),
 );
 
 // ── SIGN UP ──
@@ -109,6 +116,29 @@ router.get(
 
     // Redirect to your frontend home
     res.redirect("https://carent-snowy.vercel.app/home"); // 👈 changed
+  },
+);
+
+// Facebook signup/signin
+router.get(
+  "/facebook/callback",
+  passport.authenticate("facebook", {
+    session: false,
+    failureRedirect: "/signin",
+  }),
+  (req, res) => {
+    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.redirect("https://carent-snowy.vercel.app/home");
   },
 );
 
