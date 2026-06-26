@@ -28,7 +28,7 @@ router.get(
 // Facebook SignUp/signin
 router.get(
   "/facebook",
-  passport.authenticate("facebook", { scope: ["email"] }),
+  passport.authenticate("facebook", { scope: ["public_profile"] }),
 );
 
 // ── SIGN UP ──
