@@ -44,7 +44,7 @@ passport.use(
       clientSecret: process.env.FACEBOOK_APP_SECRET,
       callbackURL:
         "https://carent-ymkk.onrender.com/api/auth/facebook/callback", // 👈 full URL
-      profileFields: ["id", "displayName", "photos"],
+      profileFields: ["id", "displayName", "photos", "email"],
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -52,7 +52,7 @@ passport.use(
         if (!user) {
           user = await User.create({
             name: profile.displayName,
-            email: profile.emails?.[0]?.value || `${profile.id}@facebook.com`,
+            email: `${profile.id}@facebook.com` || `${profile.id}@facebook.com`,
             avatar: profile.photos?.[0]?.value,
             provider: "facebook",
             providerId: profile.id,

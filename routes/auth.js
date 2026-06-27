@@ -28,7 +28,7 @@ router.get(
 // Facebook SignUp/signin
 router.get(
   "/facebook",
-  passport.authenticate("facebook", { scope: ["public_profile"] }),
+  passport.authenticate("facebook", { scope: ["email", "public_profile"] }),
 );
 
 // ── SIGN UP ──
@@ -71,12 +71,10 @@ router.post("/signin", async (req, res) => {
       return res.status(400).json({ message: "All fields are required." });
 
     const user = await User.findOne({ email });
-    if (!user)
-      return res.status(401).json({ message: "Invalid email or password." });
+    if (!user) return res.status(401).json({ message: "User not found" });
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match)
-      return res.status(401).json({ message: "Invalid email or password." });
+    if (!match) return res.status(401).json({ message: "Password mismatch." });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
@@ -119,12 +117,16 @@ router.get(
 );
 
 // Facebook signup/signin
+
 router.get(
   "/facebook/callback",
-  passport.authenticate("facebook", {
-    session: false,
-    failureRedirect: "/signin",
-  }),
+  (req, res, next) => {
+    passport.authenticate("facebook", {
+      session: false,
+      failureRedirect:
+        "https://carent-snowy.vercel.app/signin?error=facebook_failed",
+    })(req, res, next);
+  },
   (req, res) => {
     const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
