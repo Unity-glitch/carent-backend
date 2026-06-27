@@ -118,31 +118,33 @@ router.get(
 
 // Facebook signup/signin
 
-router.get(
-  "/facebook/callback",
-  (req, res, next) => {
-    passport.authenticate("facebook", {
+router.get("/facebook/callback", (req, res, next) => {
+  passport.authenticate(
+    "facebook",
+    {
       session: false,
-      failureRedirect:
-        "https://carent-snowy.vercel.app/signin?error=facebook_failed",
-    })(req, res, next);
-  },
-  (req, res) => {
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    },
+    (err, user) => {
+      if (err || !user) {
+        console.error("Facebook auth error:", err);
+        return res.redirect("https://carent-snowy.vercel.app/signin");
+      }
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
 
-    res.redirect("https://carent-snowy.vercel.app/home");
-  },
-);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
 
+      res.redirect("https://carent-snowy.vercel.app/home");
+    },
+  )(req, res, next);
+});
 // ── SIGN OUT ──
 router.post("/signout", (req, res) => {
   res.clearCookie("token");
