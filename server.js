@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./config/passport.js"; // 👈 after dotenv
 import authRoutes from "./routes/auth.js";
-import https from https
+import https from "https";
 
 const app = express();
 
@@ -34,9 +34,13 @@ mongoose
   })
   .catch((err) => console.error("❌ MongoDB error:", err));
 
-  setInterval(() => {
-  https.get("https://carent-ymkk.onrender.com/api/health").on("error", () => {});
-}, 14 * 60 * 1000);
+setInterval(
+  () => {
+    https
+      .get("https://carent-ymkk.onrender.com/api/health")
+      .on("error", () => {});
+  },
+  14 * 60 * 1000,
+);
 
 app.get("/api/health", (req, res) => res.status(200).json({ status: "ok" }));
-
