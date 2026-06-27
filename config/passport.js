@@ -43,8 +43,10 @@ passport.use(
       clientID: process.env.FACEBOOK_APP_ID,
       clientSecret: process.env.FACEBOOK_APP_SECRET,
       callbackURL:
-        "https://carent-ymkk.onrender.com/api/auth/facebook/callback", // 👈 full URL
+        "https://carent-ymkk.onrender.com/api/auth/facebook/callback",
       profileFields: ["id", "displayName", "photos", "email"],
+      enableProof: true, // 👈 add this
+      graphAPIVersion: "v18.0", // 👈 add this
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
