@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
-dotenv.config(); // 👈 must be first before anything else
+dotenv.config();
 
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from "passport";
-import "./config/passport.js"; // 👈 after dotenv
+import "./config/passport.js";
 import authRoutes from "./routes/auth.js";
 import https from "https";
 
@@ -22,18 +22,24 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
 
+// ✅ Health route BEFORE mongoose
+app.get("/api/health", (req, res) => res.status(200).json({ status: "ok" }));
+
 app.use("/api/auth", authRoutes);
 
+// ✅ Listen BEFORE mongoose so Render detects the port immediately
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// ✅ Connect MongoDB after server starts
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected");
-    app.listen(process.env.PORT || 5000, "0.0.0.0", () =>
-      console.log(`🚀 Server running on port ${process.env.PORT || 5000}`),
-    );
-  })
+  .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error:", err));
 
+// ✅ Keep Render alive
 setInterval(
   () => {
     https
@@ -42,5 +48,3 @@ setInterval(
   },
   14 * 60 * 1000,
 );
-
-app.get("/api/health", (req, res) => res.status(200).json({ status: "ok" }));
