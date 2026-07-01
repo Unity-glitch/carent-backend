@@ -4,11 +4,16 @@ import { authenticate } from "../utils/authMiddleware.js";
 
 const router = express.Router();
 const PAYSTACK_BASE = "https://api.paystack.co";
-const paystackKey = process.env.PAYSTACK_SECRET_KEY;
-const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
+const getPaystackKey = () => process.env.PAYSTACK_SECRET_KEY;
+const getFrontendUrl = () =>
+  process.env.FRONTEND_URL || "http://localhost:5173";
 
 router.post("/initialize", authenticate, async (req, res) => {
   try {
+    const paystackKey = getPaystackKey();
+    const frontendUrl = getFrontendUrl();
+
     if (!paystackKey) {
       return res
         .status(500)
@@ -107,6 +112,8 @@ router.post("/initialize", authenticate, async (req, res) => {
 
 router.get("/verify", async (req, res) => {
   try {
+    const paystackKey = getPaystackKey();
+
     if (!paystackKey) {
       return res
         .status(500)
