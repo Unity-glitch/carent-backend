@@ -10,6 +10,7 @@ import "./config/passport.js";
 import authRoutes from "./routes/auth.js";
 import paymentRoutes from "./routes/payments.js";
 import orderRoutes from "./routes/orders.js";
+import adminRoutes from "./routes/admin.js";
 import https from "https";
 
 const app = express();
@@ -30,6 +31,7 @@ app.get("/api/health", (req, res) => res.status(200).json({ status: "ok" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
 
 // ✅ Listen BEFORE mongoose so Render detects the port immediately
 const PORT = process.env.PORT || 5000;

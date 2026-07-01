@@ -34,7 +34,7 @@ router.get(
 // ── SIGN UP ──
 router.post("/signup", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!email || !password)
       return res.status(400).json({ message: "All fields are required." });
@@ -43,8 +43,18 @@ router.post("/signup", async (req, res) => {
     if (existing)
       return res.status(409).json({ message: "Email already registered." });
 
+    if (role && !["user", "driver"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role specified." });
+    }
+
     const hashed = await bcrypt.hash(password, 12);
-    const user = await User.create({ email, password: hashed });
+    const user = await User.create({
+      name,
+      email,
+      password: hashed,
+      role: role || "user",
+      driverStatus: role === "driver" ? "pending" : undefined,
+    });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
@@ -54,7 +64,12 @@ router.post("/signup", async (req, res) => {
 
     res.status(201).json({
       message: "Account created successfully!",
-      user: { id: user._id, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
     console.error(err);
@@ -65,13 +80,19 @@ router.post("/signup", async (req, res) => {
 // ── SIGN IN ──
 router.post("/signin", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     if (!email || !password)
       return res.status(400).json({ message: "All fields are required." });
 
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: "User not found" });
+
+    if (role && user.role !== role) {
+      return res.status(403).json({
+        message: `This account is registered as ${user.role}. Please use the correct sign-in page.`,
+      });
+    }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: "Password mismatch." });
@@ -84,7 +105,12 @@ router.post("/signin", async (req, res) => {
 
     res.status(200).json({
       message: "Login successful!",
-      user: { id: user._id, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
     console.error(err);
@@ -167,6 +193,7 @@ router.get("/me", async (req, res) => {
         name: user.name,
         avatar: user.avatar,
         provider: user.provider,
+        role: user.role,
       },
     });
   } catch (err) {

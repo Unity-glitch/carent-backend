@@ -9,6 +9,12 @@ const userSchema = new mongoose.Schema(
     avatar: { type: String },
     provider: { type: String, default: "local" }, // "local", "google", "facebook"
     providerId: { type: String },
+    role: { type: String, enum: ["user", "admin", "driver"], default: "user" },
+    driverStatus: {
+      type: String,
+      enum: ["pending", "approved", "blocked"],
+      default: "pending",
+    },
   },
   { timestamps: true },
 );

@@ -45,6 +45,7 @@ export const persistUser = (userData = {}) => {
     email: userData.email || "",
     name: buildDisplayName(userData.name, userData.email),
     avatar: userData.avatar || userData.picture || userData.photo || "",
+    role: userData.role || "user",
     initials: buildInitials(userData.name, userData.email),
   };
 

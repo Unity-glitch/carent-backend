@@ -22,3 +22,15 @@ export const authenticate = async (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 };
+
+export const adminOnly = (req, res, next) => {
+  try {
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+    if (req.user.role !== "admin")
+      return res.status(403).json({ message: "Forbidden" });
+    next();
+  } catch (err) {
+    console.error("Admin middleware error:", err);
+    return res.status(403).json({ message: "Forbidden" });
+  }
+};
