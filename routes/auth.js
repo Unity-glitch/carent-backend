@@ -11,8 +11,8 @@ const router = express.Router();
 
 const cookieOptions = {
   httpOnly: true,
-  secure: true, // 👈 changed
-  sameSite: "none", // 👈 changed
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
@@ -106,13 +106,13 @@ router.get(
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     // Redirect to your frontend home
-    res.redirect("https://carent-snowy.vercel.app/home"); // 👈 changed
+    res.redirect("https://carent-snowy.vercel.app/home");
   },
 );
 
