@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./config/passport.js";
 import authRoutes from "./routes/auth.js";
+import paymentRoutes from "./routes/payments.js";
+import orderRoutes from "./routes/orders.js";
 import https from "https";
 
 const app = express();
@@ -26,6 +28,8 @@ app.use(passport.initialize());
 app.get("/api/health", (req, res) => res.status(200).json({ status: "ok" }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/orders", orderRoutes);
 
 // ✅ Listen BEFORE mongoose so Render detects the port immediately
 const PORT = process.env.PORT || 5000;
